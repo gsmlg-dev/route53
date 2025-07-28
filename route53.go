@@ -8,6 +8,9 @@ import (
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 )
 
+// Provider wraps the provider implementation as a Caddy module.
+type Provider struct{ *R53Provider }
+
 func init() {
 	caddy.RegisterModule(Provider{})
 }
@@ -17,7 +20,7 @@ func (Provider) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
 		ID: "dns.providers.route53",
 		New: func() caddy.Module {
-			return &Provider{new(Provider)}
+			return &Provider{new(R53Provider)}
 		},
 	}
 }
@@ -25,13 +28,13 @@ func (Provider) CaddyModule() caddy.ModuleInfo {
 // Provision implements the Provisioner interface to initialize the AWS Client
 func (p *Provider) Provision(ctx caddy.Context) error {
 	repl := caddy.NewReplacer()
-	p.Provider.Profile = repl.ReplaceAll(p.Provider.Profile, "")
-	p.Provider.AWSProfile = repl.ReplaceAll(p.Provider.AWSProfile, "")
-	p.Provider.AccessKeyId = repl.ReplaceAll(p.Provider.AccessKeyId, "")
-	p.Provider.SecretAccessKey = repl.ReplaceAll(p.Provider.SecretAccessKey, "")
-	p.Provider.Token = repl.ReplaceAll(p.Provider.Token, "")
-	p.Provider.SessionToken = repl.ReplaceAll(p.Provider.SessionToken, "")
-	p.Provider.Region = repl.ReplaceAll(p.Provider.Region, "")
+	p.R53Provider.Profile = repl.ReplaceAll(p.R53Provider.Profile, "")
+	p.R53Provider.AWSProfile = repl.ReplaceAll(p.R53Provider.AWSProfile, "")
+	p.R53Provider.AccessKeyId = repl.ReplaceAll(p.R53Provider.AccessKeyId, "")
+	p.R53Provider.SecretAccessKey = repl.ReplaceAll(p.R53Provider.SecretAccessKey, "")
+	p.R53Provider.Token = repl.ReplaceAll(p.R53Provider.Token, "")
+	p.R53Provider.SessionToken = repl.ReplaceAll(p.R53Provider.SessionToken, "")
+	p.R53Provider.Region = repl.ReplaceAll(p.R53Provider.Region, "")
 	return nil
 }
 
@@ -58,7 +61,7 @@ func (p *Provider) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 			case "wait_for_propagation":
 				if d.NextArg() {
 					if wait, err := strconv.ParseBool(d.Val()); err == nil {
-						p.Provider.WaitForPropagation = wait
+						p.R53Provider.WaitForPropagation = wait
 					}
 				}
 				if d.NextArg() {
@@ -67,7 +70,7 @@ func (p *Provider) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 			case "max_wait_dur":
 				if d.NextArg() {
 					if dur, err := strconv.ParseInt(d.Val(), 10, 64); err == nil {
-						p.Provider.MaxWaitDur = time.Duration(dur)
+						p.R53Provider.MaxWaitDur = time.Duration(dur)
 					}
 				}
 				if d.NextArg() {
@@ -75,63 +78,63 @@ func (p *Provider) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 				}
 			case "max_retries":
 				if d.NextArg() {
-					p.Provider.MaxRetries, _ = strconv.Atoi(d.Val())
+					p.R53Provider.MaxRetries, _ = strconv.Atoi(d.Val())
 				}
 				if d.NextArg() {
 					return d.ArgErr()
 				}
 			case "profile":
 				if d.NextArg() {
-					p.Provider.Profile = d.Val()
+					p.R53Provider.Profile = d.Val()
 				}
 				if d.NextArg() {
 					return d.ArgErr()
 				}
 			case "aws_profile":
 				if d.NextArg() {
-					p.Provider.AWSProfile = d.Val()
+					p.R53Provider.AWSProfile = d.Val()
 				}
 				if d.NextArg() {
 					return d.ArgErr()
 				}
 			case "access_key_id":
 				if d.NextArg() {
-					p.Provider.AccessKeyId = d.Val()
+					p.R53Provider.AccessKeyId = d.Val()
 				}
 				if d.NextArg() {
 					return d.ArgErr()
 				}
 			case "secret_access_key":
 				if d.NextArg() {
-					p.Provider.SecretAccessKey = d.Val()
+					p.R53Provider.SecretAccessKey = d.Val()
 				}
 				if d.NextArg() {
 					return d.ArgErr()
 				}
 			case "session_token":
 				if d.NextArg() {
-					p.Provider.SessionToken = d.Val()
+					p.R53Provider.SessionToken = d.Val()
 				}
 				if d.NextArg() {
 					return d.ArgErr()
 				}
 			case "token":
 				if d.NextArg() {
-					p.Provider.Token = d.Val()
+					p.R53Provider.Token = d.Val()
 				}
 				if d.NextArg() {
 					return d.ArgErr()
 				}
 			case "region":
 				if d.NextArg() {
-					p.Provider.Region = d.Val()
+					p.R53Provider.Region = d.Val()
 				}
 				if d.NextArg() {
 					return d.ArgErr()
 				}
 			case "hosted_zone_id":
 				if d.NextArg() {
-					p.Provider.HostedZoneID = d.Val()
+					p.R53Provider.HostedZoneID = d.Val()
 				}
 				if d.NextArg() {
 					return d.ArgErr()

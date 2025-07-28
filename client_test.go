@@ -362,7 +362,7 @@ func TestMaxWaitDur(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			provider := Provider{MaxWaitDur: c.input}
+			provider := R53Provider{MaxWaitDur: c.input}
 			provider.init(context.TODO())
 			actual := provider.MaxWaitDur
 			if actual != c.expected {
