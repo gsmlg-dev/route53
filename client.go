@@ -18,7 +18,7 @@ import (
 )
 
 // init initializes the AWS client
-func (p *Provider) init(ctx context.Context) {
+func (p *R53Provider) init(ctx context.Context) {
 	if p.client != nil {
 		return
 	}
@@ -163,7 +163,7 @@ func marshalRecord(record libdns.RR) []types.ResourceRecord {
 	return resourceRecords
 }
 
-func (p *Provider) getRecords(ctx context.Context, zoneID string, _ string) ([]libdns.Record, error) {
+func (p *R53Provider) getRecords(ctx context.Context, zoneID string, _ string) ([]libdns.Record, error) {
 	getRecordsInput := &r53.ListResourceRecordSetsInput{
 		HostedZoneId: aws.String(zoneID),
 		MaxItems:     aws.Int32(1000),
@@ -201,7 +201,7 @@ func (p *Provider) getRecords(ctx context.Context, zoneID string, _ string) ([]l
 	return records, nil
 }
 
-func (p *Provider) getZoneID(ctx context.Context, zoneName string) (string, error) {
+func (p *R53Provider) getZoneID(ctx context.Context, zoneName string) (string, error) {
 	if p.HostedZoneID != "" {
 		return "/hostedzone/" + p.HostedZoneID, nil
 	}
@@ -254,7 +254,7 @@ func (p *Provider) getZoneID(ctx context.Context, zoneName string) (string, erro
 	return "", fmt.Errorf("HostedZoneNotFound: No zones found for the domain %s", zoneName)
 }
 
-func (p *Provider) createRecord(ctx context.Context, zoneID string, record libdns.Record, zone string) (libdns.Record, error) {
+func (p *R53Provider) createRecord(ctx context.Context, zoneID string, record libdns.Record, zone string) (libdns.Record, error) {
 	// AWS Route53 TXT record value must be enclosed in quotation marks on create
 	switch record.RR().Type {
 	case "TXT":
@@ -287,7 +287,7 @@ func (p *Provider) createRecord(ctx context.Context, zoneID string, record libdn
 	return record, nil
 }
 
-func (p *Provider) updateRecord(ctx context.Context, zoneID string, record libdns.Record, zone string) (libdns.Record, error) {
+func (p *R53Provider) updateRecord(ctx context.Context, zoneID string, record libdns.Record, zone string) (libdns.Record, error) {
 	resourceRecords := make([]types.ResourceRecord, 0)
 	// AWS Route53 TXT record value must be enclosed in quotation marks on update
 	if record.RR().Type == "TXT" {
@@ -328,7 +328,7 @@ func (p *Provider) updateRecord(ctx context.Context, zoneID string, record libdn
 	return record, nil
 }
 
-func (p *Provider) deleteRecord(ctx context.Context, zoneID string, record libdns.Record, zone string) (libdns.Record, error) {
+func (p *R53Provider) deleteRecord(ctx context.Context, zoneID string, record libdns.Record, zone string) (libdns.Record, error) {
 	action := types.ChangeActionDelete
 	resourceRecords := make([]types.ResourceRecord, 0)
 	// AWS Route53 TXT record value must be enclosed in quotation marks on update
@@ -383,7 +383,7 @@ func (p *Provider) deleteRecord(ctx context.Context, zoneID string, record libdn
 	return record, nil
 }
 
-func (p *Provider) applyChange(ctx context.Context, input *r53.ChangeResourceRecordSetsInput) error {
+func (p *R53Provider) applyChange(ctx context.Context, input *r53.ChangeResourceRecordSetsInput) error {
 	changeResult, err := p.client.ChangeResourceRecordSets(ctx, input)
 	if err != nil {
 		return err
@@ -406,7 +406,7 @@ func (p *Provider) applyChange(ctx context.Context, input *r53.ChangeResourceRec
 	return nil
 }
 
-func (p *Provider) getTxtRecords(ctx context.Context, zoneID string, zone string) ([]libdns.RR, error) {
+func (p *R53Provider) getTxtRecords(ctx context.Context, zoneID string, zone string) ([]libdns.RR, error) {
 	txtRecords := make([]libdns.RR, 0)
 	records, err := p.getRecords(ctx, zoneID, zone)
 	if err != nil {
@@ -420,7 +420,7 @@ func (p *Provider) getTxtRecords(ctx context.Context, zoneID string, zone string
 	return txtRecords, nil
 }
 
-func (p *Provider) getTxtRecordsFor(ctx context.Context, zoneID string, zone string, name string) ([]libdns.RR, error) {
+func (p *R53Provider) getTxtRecordsFor(ctx context.Context, zoneID string, zone string, name string) ([]libdns.RR, error) {
 	txtRecords, err := p.getTxtRecords(ctx, zoneID, zone)
 	if err != nil {
 		return nil, err

@@ -8,11 +8,11 @@ import (
 	"github.com/libdns/libdns"
 )
 
-// Provider implements the libdns interfaces for Route53.
+// R53Provider implements the libdns interfaces for Route53.
 //
 // By default, the provider loads the AWS configuration from the environment.
-// To override these values, set the fields in the Provider struct.
-type Provider struct {
+// To override these values, set the fields in the R53Provider struct.
+type R53Provider struct {
 	client *r53.Client
 
 	// Region is the AWS Region to use. If not set, it will use AWS_REGION
@@ -68,7 +68,7 @@ type Provider struct {
 }
 
 // GetRecords lists all the records in the zone.
-func (p *Provider) GetRecords(ctx context.Context, zone string) ([]libdns.Record, error) {
+func (p *R53Provider) GetRecords(ctx context.Context, zone string) ([]libdns.Record, error) {
 	p.init(ctx)
 
 	zoneID, err := p.getZoneID(ctx, zone)
@@ -85,7 +85,7 @@ func (p *Provider) GetRecords(ctx context.Context, zone string) ([]libdns.Record
 }
 
 // AppendRecords adds records to the zone. It returns the records that were added.
-func (p *Provider) AppendRecords(ctx context.Context, zone string, records []libdns.Record) ([]libdns.Record, error) {
+func (p *R53Provider) AppendRecords(ctx context.Context, zone string, records []libdns.Record) ([]libdns.Record, error) {
 	p.init(ctx)
 
 	zoneID, err := p.getZoneID(ctx, zone)
@@ -108,7 +108,7 @@ func (p *Provider) AppendRecords(ctx context.Context, zone string, records []lib
 
 // DeleteRecords deletes the records from the zone. If a record does not have an ID,
 // it will be looked up. It returns the records that were deleted.
-func (p *Provider) DeleteRecords(ctx context.Context, zone string, records []libdns.Record) ([]libdns.Record, error) {
+func (p *R53Provider) DeleteRecords(ctx context.Context, zone string, records []libdns.Record) ([]libdns.Record, error) {
 	p.init(ctx)
 
 	zoneID, err := p.getZoneID(ctx, zone)
@@ -131,7 +131,7 @@ func (p *Provider) DeleteRecords(ctx context.Context, zone string, records []lib
 
 // SetRecords sets the records in the zone, either by updating existing records
 // or creating new ones. It returns the updated records.
-func (p *Provider) SetRecords(ctx context.Context, zone string, records []libdns.Record) ([]libdns.Record, error) {
+func (p *R53Provider) SetRecords(ctx context.Context, zone string, records []libdns.Record) ([]libdns.Record, error) {
 	p.init(ctx)
 
 	zoneID, err := p.getZoneID(ctx, zone)
@@ -154,8 +154,8 @@ func (p *Provider) SetRecords(ctx context.Context, zone string, records []libdns
 
 // Interface guards
 var (
-	_ libdns.RecordGetter   = (*Provider)(nil)
-	_ libdns.RecordAppender = (*Provider)(nil)
-	_ libdns.RecordSetter   = (*Provider)(nil)
-	_ libdns.RecordDeleter  = (*Provider)(nil)
+	_ libdns.RecordGetter   = (*R53Provider)(nil)
+	_ libdns.RecordAppender = (*R53Provider)(nil)
+	_ libdns.RecordSetter   = (*R53Provider)(nil)
+	_ libdns.RecordDeleter  = (*R53Provider)(nil)
 )
